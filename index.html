@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TRACE-AI — Digital Evidence Correlation & Forensic Investigation Framework (SUTRAM 2026)</title>
+    
+    <!-- CSS Stylesheets -->
+    <link rel="stylesheet" href="/static/css/styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/vis-network/9.1.2/dist/dist/vis-network.min.css" />
+    
+    <!-- Vis.js for Network Graphs -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/vis-network/9.1.2/dist/vis-network.min.js"></script>
+</head>
+<body>
+
+    <!-- Header Navbar -->
+    <nav class="navbar">
+        <div class="brand">
+            <div class="brand-icon">T</div>
+            <div>
+                <div class="brand-title">TRACE-AI</div>
+                <div style="font-size:0.7rem; color:var(--text-muted); font-weight:600;">DIGITAL EVIDENCE CORRELATION & FORENSIC FRAMEWORK</div>
+            </div>
+            <span class="brand-badge">SUTRAM 2026 • IGDTUW</span>
+        </div>
+        <div class="header-status">
+            <div class="status-badge">
+                <span class="pulse-dot"></span>
+                <span>BSA 2023 / SEC 65B COMPLIANT</span>
+            </div>
+            <div style="font-size:0.8rem; color:var(--text-muted);">
+                MeitY ISEA Phase-III
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Workspace Container -->
+    <div class="main-container">
+
+        <!-- Navigation Tabs -->
+        <div class="nav-tabs">
+            <button class="tab-btn active" data-tab="tab-overview">
+                <span>📊</span> Executive Dashboard
+            </button>
+            <button class="tab-btn" data-tab="tab-ingest">
+                <span>🔐</span> Ingest & SHA-256 Lock
+            </button>
+            <button class="tab-btn" data-tab="tab-timeline">
+                <span>⏳</span> Swimlane Timeline
+            </button>
+            <button class="tab-btn" data-tab="tab-graph">
+                <span>🧠</span> Causal Event Graph
+            </button>
+            <button class="tab-btn" data-tab="tab-mitre">
+                <span>🎯</span> MITRE ATT&CK Matrix
+            </button>
+            <button class="tab-btn" data-tab="tab-copilot">
+                <span>🤖</span> Grounded AI Copilot
+            </button>
+            <button class="tab-btn" data-tab="tab-legal">
+                <span>📜</span> Sec 65B (BSA) Certificate
+            </button>
+            <button class="tab-btn" data-tab="tab-coc">
+                <span>⛓️</span> Chain of Custody
+            </button>
+        </div>
+
+        <!-- 1. Executive Dashboard Panel -->
+        <div id="tab-overview" class="tab-panel active">
+            <div class="card" style="margin-bottom:1.5rem; background:linear-gradient(135deg, rgba(13,17,26,0.9), rgba(30,58,138,0.2)); border-color:var(--border-glow);">
+                <div style="display:flex; justify-content:space-between; align-items:center;">
+                    <div>
+                        <div style="font-size:0.8rem; color:var(--accent-cyan); font-weight:700; text-transform:uppercase; letter-spacing:1px;">Active Incident Investigation</div>
+                        <h2 id="incident-title" style="font-size:1.6rem; font-weight:800; margin-top:4px;">USB Data Exfiltration & Encoded PowerShell C2 Beacon</h2>
+                        <div style="font-size:0.88rem; color:var(--text-muted); margin-top:6px;">
+                            Target Host: <strong id="metric-host" style="color:#fff;">WORKSTATION-RIG-01 (192.168.1.105)</strong> | Investigator: <strong>Officer V. Sharma</strong>
+                        </div>
+                    </div>
+                    <div style="text-align:right;">
+                        <span id="metric-threat" class="status-badge" style="background:rgba(239,68,68,0.25); color:#ef4444; border-color:rgba(239,68,68,0.5); font-size:1rem; padding:8px 18px; font-weight:800;">
+                            CRITICAL THREAT
+                        </span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Metrics Grid -->
+            <div class="grid-cols-4" style="margin-bottom:1.5rem;">
+                <div class="metric-card">
+                    <span class="metric-title">Correlated Forensic Events</span>
+                    <span id="metric-events" class="metric-value">5</span>
+                    <span style="font-size:0.75rem; color:var(--accent-emerald);">✔ UTC Microsecond Aligned</span>
+                </div>
+                <div class="metric-card">
+                    <span class="metric-title">Ingested Artifact Sources</span>
+                    <span class="metric-value" style="color:var(--accent-purple);">4</span>
+                    <span style="font-size:0.75rem; color:var(--text-muted);">EVTX, PCAP, USB, SQLite</span>
+                </div>
+                <div class="metric-card">
+                    <span class="metric-title">Chain of Custody Status</span>
+                    <span class="metric-value" style="color:var(--accent-emerald);">LOCKED</span>
+                    <span style="font-size:0.75rem; color:var(--accent-emerald);">✔ ISO 27037 Certified</span>
+                </div>
+                <div class="metric-card">
+                    <span class="metric-title">Legal Compliance</span>
+                    <span class="metric-value" style="color:var(--accent-amber);">BSA 2023</span>
+                    <span style="font-size:0.75rem; color:var(--text-muted);">Sec 63 / Sec 65B Ready</span>
+                </div>
+            </div>
+
+            <!-- Tactics Triggered -->
+            <div class="card" style="margin-bottom:1.5rem;">
+                <div class="card-header">
+                    <div class="card-title">🎯 Triggered MITRE ATT&CK Adversary Tactics</div>
+                </div>
+                <div id="summary-tactics" style="display:flex; gap:10px; flex-wrap:wrap;">
+                    <!-- Loaded dynamically -->
+                </div>
+            </div>
+
+            <!-- Investigation Overview & Problem Statement -->
+            <div class="grid-cols-3">
+                <div class="card">
+                    <div class="card-title" style="margin-bottom:0.75rem; color:var(--accent-cyan);">🔐 1. Preserve & Verify</div>
+                    <p style="font-size:0.85rem; color:var(--text-muted);">
+                        Instant SHA-256 and SHA-3 cryptographic hashing upon ingest. Immutable audit trail ensures zero bitstream modification for Indian court admissibility.
+                    </p>
+                </div>
+                <div class="card">
+                    <div class="card-title" style="margin-bottom:0.75rem; color:var(--accent-purple);">🧠 2. Correlate & Map</div>
+                    <p style="font-size:0.85rem; color:var(--text-muted);">
+                        Unified causal event graph aligns clock drifts, bridges Windows EVTX logs, network PCAPs, USB serial numbers, and maps directly to MITRE ATT&CK matrix.
+                    </p>
+                </div>
+                <div class="card">
+                    <div class="card-title" style="margin-bottom:0.75rem; color:var(--accent-emerald);">🤖 3. Reconstruct & BSA Export</div>
+                    <p style="font-size:0.85rem; color:var(--text-muted);">
+                        Zero-hallucination AI Copilot provides plain-English investigation answers with exact log citations, exporting 1-click Bharatiya Sakshya Adhiniyam Sec 65B court certificates.
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- 2. Ingest Evidence Panel -->
+        <div id="tab-ingest" class="tab-panel">
+            <div class="card" style="margin-bottom:1.5rem;">
+                <div class="card-header">
+                    <div class="card-title">📁 Cryptographic Evidence Intake Sandbox (ISO 27037)</div>
+                </div>
+                <div class="upload-zone" id="upload-zone-area" onclick="document.getElementById('evidence-file-input').click()">
+                    <div class="upload-icon">🔒</div>
+                    <h3 style="margin-bottom:0.5rem;">Click Here to Select or Drag & Drop Evidence Files</h3>
+                    <p style="color:var(--text-muted); font-size:0.85rem; margin-bottom:1rem;">
+                        Supported Formats: Any Log Files (.log, .txt), Windows Event Logs (.EVTX), Network Captures (.PCAP), Browser SQLite (.db), USB Registry (.hive)
+                    </p>
+                    <input type="file" id="evidence-file-input" style="display:none;" />
+                    <button class="btn-primary" type="button">Browse Evidence File</button>
+                    <div id="selected-file-display" style="margin-top:12px; font-weight:700; color:var(--accent-cyan); font-size:0.95rem;"></div>
+                </div>
+
+                <div style="margin-top:1.5rem; text-align:center;">
+                    <button id="btn-upload" class="btn-primary" style="padding:12px 30px; font-size:1rem;">Upload & Cryptographic Lock</button>
+                </div>
+            </div>
+
+            <!-- Ingested Evidence Files Table -->
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title">🔒 Cryptographically Locked Evidence Files</div>
+                    <div class="status-badge" style="background:rgba(16,185,129,0.15); color:var(--accent-emerald);">ISO 27037 Certified Write-Blocked Sandbox</div>
+                </div>
+                <div id="ingested-files-container">
+                    <!-- Loaded dynamically -->
+                </div>
+            </div>
+        </div>
+
+        <!-- 3. Swimlane Timeline Panel -->
+        <div id="tab-timeline" class="tab-panel">
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title">⏳ Plaso-Style Unified Super Timeline (UTC Synchronized)</div>
+                    <div style="font-size:0.8rem; color:var(--accent-cyan);">Microsecond Timestamp Alignment</div>
+                </div>
+                <div id="timeline-list" class="timeline-container">
+                    <!-- Loaded dynamically -->
+                </div>
+            </div>
+        </div>
+
+        <!-- 4. Causal Event Graph Panel -->
+        <div id="tab-graph" class="tab-panel">
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title">🧠 Interactive Causal Knowledge Graph (Entity Resolution Engine)</div>
+                    <div style="font-size:0.8rem; color:var(--text-muted);">Nodes: Users, Processes, Files, IPs, USB Devices</div>
+                </div>
+                <div id="vis-graph-container"></div>
+            </div>
+        </div>
+
+        <!-- 5. MITRE ATT&CK Matrix Panel -->
+        <div id="tab-mitre" class="tab-panel">
+            <div class="card-header" style="margin-bottom:1rem;">
+                <div class="card-title">🎯 MITRE ATT&CK Adversary Tactics Correlation Matrix</div>
+            </div>
+            <div id="mitre-matrix-grid" class="grid-cols-4">
+                <!-- Loaded dynamically -->
+            </div>
+        </div>
+
+        <!-- 6. Grounded AI Copilot Panel -->
+        <div id="tab-copilot" class="tab-panel">
+            <div class="grid-main-side">
+                <div class="card" style="padding:1rem;">
+                    <div class="card-header">
+                        <div class="card-title">🤖 Grounded AI Forensic Copilot (Zero-Hallucination Engine)</div>
+                        <span class="status-badge">EXACT LOG CITATIONS ENFORCED</span>
+                    </div>
+                    <div class="chat-container">
+                        <div id="chat-messages" class="chat-messages">
+                            <div class="msg msg-copilot">
+                                <div>
+                                    Hello Officer! I am TRACE-AI Copilot. Ask me any question about the evidence logs, USB insertions, PowerShell scripts, or attack timeline. Every answer is grounded strictly in verified artifact timestamps.
+                                </div>
+                            </div>
+                        </div>
+                        <div class="chat-input-bar">
+                            <input type="text" id="chat-input" class="chat-input" placeholder="e.g. What USB device was attached? Show PowerShell command..." />
+                            <button id="btn-send-chat" class="btn-primary">Ask Copilot</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-title" style="margin-bottom:1rem; font-size:0.95rem;">💡 Quick Forensic Prompts</div>
+                    <div style="display:flex; flex-direction:column; gap:8px;">
+                        <button class="tab-btn prompt-pill" style="border:1px solid var(--border-color); text-align:left;">What USB device was inserted?</button>
+                        <button class="tab-btn prompt-pill" style="border:1px solid var(--border-color); text-align:left;">Show powershell encoded command</button>
+                        <button class="tab-btn prompt-pill" style="border:1px solid var(--border-color); text-align:left;">Explain exfiltrated confidential files</button>
+                        <button class="tab-btn prompt-pill" style="border:1px solid var(--border-color); text-align:left;">Summarize attack flow for court submission</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 7. Sec 65B Legal Certificate Panel -->
+        <div id="tab-legal" class="tab-panel">
+            <div class="card" style="margin-bottom:1.5rem;">
+                <div class="card-header">
+                    <div class="card-title">📜 Bharatiya Sakshya Adhiniyam (BSA 2023) / Sec 65B Certificate Generator</div>
+                    <button id="btn-print-cert" class="btn-primary">🖨️ Print / Save Official PDF Certificate</button>
+                </div>
+                <div class="grid-cols-4" style="margin-bottom:1rem;">
+                    <div>
+                        <label style="font-size:0.8rem; color:var(--text-muted); display:block; margin-bottom:4px;">Investigating Officer</label>
+                        <input type="text" id="cert-investigator" class="chat-input" value="Inspector V. Sharma" style="width:100%;" />
+                    </div>
+                    <div>
+                        <label style="font-size:0.8rem; color:var(--text-muted); display:block; margin-bottom:4px;">Law Enforcement Agency</label>
+                        <input type="text" id="cert-agency" class="chat-input" value="Cyber Crime Cell, Delhi Police" style="width:100%;" />
+                    </div>
+                    <div>
+                        <label style="font-size:0.8rem; color:var(--text-muted); display:block; margin-bottom:4px;">FIR / Case Reference</label>
+                        <input type="text" id="cert-caseref" class="chat-input" value="FIR-2026/0492-SUTRAM" style="width:100%;" />
+                    </div>
+                    <div>
+                        <label style="font-size:0.8rem; color:var(--text-muted); display:block; margin-bottom:4px;">Acquisition Workstation</label>
+                        <input type="text" id="cert-device" class="chat-input" value="Forensic Workstation RIG-01" style="width:100%;" />
+                    </div>
+                </div>
+                <button id="btn-generate-cert" class="btn-primary" style="width:100%;">Generate Certified Electronic Evidence Certificate</button>
+            </div>
+
+            <!-- Output Printable Certificate Container -->
+            <div id="cert-paper-output">
+                <!-- Certificate paper rendered dynamically -->
+            </div>
+        </div>
+
+        <!-- 8. Chain of Custody Panel -->
+        <div id="tab-coc" class="tab-panel">
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title">⛓️ Cryptographic Chain of Custody (CoC) Immutable Audit Ledger</div>
+                    <div style="font-size:0.8rem; color:var(--accent-emerald);">ISO 27037 Compliant Chained SHA-256 Hashes</div>
+                </div>
+                <div id="coc-ledger-list" class="timeline-container">
+                    <!-- Loaded dynamically -->
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Application JavaScript Modules -->
+    <script src="/static/js/app.js"></script>
+    <script src="/static/js/timeline.js"></script>
+    <script src="/static/js/graph.js"></script>
+    <script src="/static/js/copilot.js"></script>
+    <script src="/static/js/certificate.js"></script>
+</body>
+</html>
