@@ -8,6 +8,7 @@ import os
 import json
 import time
 from typing import List, Dict, Any, Optional
+
 from fastapi import FastAPI, File, UploadFile, Form, BackgroundTasks, HTTPException, Request
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import HTMLResponse, JSONResponse, FileResponse
@@ -20,11 +21,13 @@ from forensic_engine.graph_engine import ForensicGraphEngine
 from forensic_engine.sec65b_generator import Sec65BCertificateGenerator
 from ai_copilot.grounded_rag import GroundedAICopilot
 
+
 app = FastAPI(
     title="TRACE-AI Forensic Framework",
     description="AI-Powered Digital Evidence Correlation & Legal Admissibility Framework (BSA 2023 / Sec 65B)",
     version="1.0.0"
 )
+
 
 # Initialize Core Services
 ingester = EvidenceIngester()
@@ -34,19 +37,26 @@ graph_engine = ForensicGraphEngine()
 sec65b_generator = Sec65BCertificateGenerator()
 copilot = GroundedAICopilot()
 
+
 # Mount Static Files
 static_dir = os.path.join(os.path.dirname(__file__), "static")
+
 if not os.path.exists(static_dir):
     os.makedirs(static_dir, exist_ok=True)
+
 app.mount("/static", StaticFiles(directory=static_dir), name="static")
+
 
 @app.get("/", response_class=HTMLResponse)
 async def read_root():
     index_path = os.path.join(static_dir, "index.html")
+
     if os.path.exists(index_path):
         with open(index_path, "r", encoding="utf-8") as f:
             return HTMLResponse(content=f.read())
+
     return HTMLResponse(content="<h1>TRACE-AI API Server Running</h1>")
+
 
 @app.get("/api/health")
 async def health_check():
@@ -57,30 +67,43 @@ async def health_check():
         "meity_isea_phase": "ISEA Phase-III (IGDTUW)"
     }
 
+
 @app.post("/api/evidence/upload")
-async def upload_evidence(file: UploadFile = File(...), investigator: str = Form("Officer Admin")):
+async def upload_evidence(
+    file: UploadFile = File(...),
+    investigator: str = Form("Officer Admin")
+):
     """
     Step 1: Cryptographic Ingestion & Evidence Lock
     Computes SHA-256, SHA-3, logs Chain of Custody entry.
     """
     try:
         content = await file.read()
-        evidence_record = ingester.process_file(file.filename, content, investigator)
-        
-        # Parse file contents based on format
-        parsed_events = parser_manager.parse_file(file.filename, content, evidence_record["evidence_id"])
-        
-        # Add events to master correlation engine
+
+        evidence_record = ingester.process_file(
+            file.filename,
+            content,
+            investigator
+        )
+
+        parsed_events = parser_manager.parse_file(
+            file.filename,
+            content,
+            evidence_record["evidence_id"]
+        )
+
         correlation_engine.add_events(parsed_events)
-        
+
         return {
             "status": "SUCCESS",
             "message": f"Artifact {file.filename} ingested and cryptographically locked.",
             "evidence": evidence_record,
             "parsed_event_count": len(parsed_events)
         }
+
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
+
 
 @app.get("/api/evidence/chain-of-custody")
 async def get_chain_of_custody():
@@ -90,6 +113,7 @@ async def get_chain_of_custody():
         "total_records": len(ingester.get_ledger())
     }
 
+
 @app.get("/api/evidence/list")
 async def get_evidence_list():
     """Returns list of all cryptographically locked evidence files."""
@@ -97,6 +121,7 @@ async def get_evidence_list():
         "files": ingester.get_evidence_files(),
         "total_files": len(ingester.get_evidence_files())
     }
+
 
 @app.get("/api/forensics/demo-scenario")
 async def load_demo_scenario():
@@ -110,7 +135,7 @@ async def load_demo_scenario():
     demo_data = correlation_engine.load_demo_scenario()
     graph_data = graph_engine.build_graph(demo_data["events"])
     mitre_data = correlation_engine.get_mitre_matrix(demo_data["events"])
-    
+
     return {
         "status": "SUCCESS",
         "scenario": demo_data,
@@ -119,31 +144,39 @@ async def load_demo_scenario():
         "summary": demo_data["summary"]
     }
 
+
 @app.get("/api/forensics/timeline")
 async def get_timeline():
     """Returns microsecond-synchronized timeline swimlanes."""
     timeline = correlation_engine.get_unified_timeline()
+
     return {
         "timeline": timeline,
         "event_count": len(timeline)
     }
+
 
 @app.get("/api/forensics/graph")
 async def get_causal_graph():
     """Returns the visual node-link causal event graph."""
     events = correlation_engine.get_unified_timeline()
     graph_data = graph_engine.build_graph(events)
+
     return graph_data
+
 
 @app.get("/api/forensics/mitre-matrix")
 async def get_mitre_mapping():
     """Returns mapping of evidence to MITRE ATT&CK tactics & techniques."""
     events = correlation_engine.get_unified_timeline()
+
     return correlation_engine.get_mitre_matrix(events)
+
 
 class CopilotQuery(BaseModel):
     query: str
     session_id: Optional[str] = "default"
+
 
 @app.post("/api/copilot/query")
 async def query_copilot(request: CopilotQuery):
@@ -153,7 +186,9 @@ async def query_copilot(request: CopilotQuery):
     """
     events = correlation_engine.get_unified_timeline()
     response = copilot.analyze(request.query, events)
+
     return response
+
 
 @app.post("/api/legal/generate-sec65b")
 async def generate_sec65b_certificate(
@@ -168,6 +203,7 @@ async def generate_sec65b_certificate(
     """
     events = correlation_engine.get_unified_timeline()
     ledger = ingester.get_ledger()
+
     cert = sec65b_generator.generate_certificate(
         investigator_name=investigator_name,
         agency=agency,
@@ -176,8 +212,16 @@ async def generate_sec65b_certificate(
         evidence_ledger=ledger,
         timeline_events=events
     )
+
     return cert
+
 
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run("main:app", host="0.0.0.0", port=8000, reload=True)
+
+    uvicorn.run(
+        "main:app",
+        host="0.0.0.0",
+        port=8000,
+        reload=True
+    )
