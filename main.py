@@ -93,7 +93,7 @@ async def get_chain_of_custody():
 @app.get("/api/evidence/list")
 async def get_evidence_list():
     """Returns list of all cryptographically locked evidence files."""
-return {
+    return {
         "files": ingester.get_evidence_files(),
         "total_files": len(ingester.get_evidence_files())
     }
