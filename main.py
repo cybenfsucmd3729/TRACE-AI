@@ -92,7 +92,8 @@ async def get_chain_of_custody():
 
 @app.get("/api/evidence/list")
 async def get_evidence_list():
-    """Returns list of all cryptographically locked evidence files."""    return {
+    """Returns list of all cryptographically locked evidence files."""
+return {
         "files": ingester.get_evidence_files(),
         "total_files": len(ingester.get_evidence_files())
     }
@@ -179,4 +180,4 @@ async def generate_sec65b_certificate(
 
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run("main:app", host="host="0.0.0.0", port=8000, reload=True)
+    uvicorn.run("main:app", host="0.0.0.0", port=8000, reload=True)
