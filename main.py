@@ -14,12 +14,12 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.responses import HTMLResponse, JSONResponse, FileResponse
 from pydantic import BaseModel
 
-from forensic_engine.ingestion import EvidenceIngester
-from forensic_engine.parsers import ForensicParserManager
-from forensic_engine.correlation import CorrelationEngine
-from forensic_engine.graph_engine import ForensicGraphEngine
-from forensic_engine.sec65b_generator import Sec65BCertificateGenerator
-from ai_copilot.grounded_rag import GroundedAICopilot
+from ingestion import EvidenceIngester
+from parsers import ForensicParserManager
+from correlation import CorrelationEngine
+from graph_engine import ForensicGraphEngine
+from sec65b_generator import Sec65BCertificateGenerator
+from grounded_rag import GroundedAICopilot
 
 
 app = FastAPI(
@@ -38,7 +38,7 @@ sec65b_generator = Sec65BCertificateGenerator()
 copilot = GroundedAICopilot()
 
 
-# Mount Static Files
+# Static files
 static_dir = os.path.join(os.path.dirname(__file__), "static")
 
 if not os.path.exists(static_dir):
@@ -49,7 +49,7 @@ app.mount("/static", StaticFiles(directory=static_dir), name="static")
 
 @app.get("/", response_class=HTMLResponse)
 async def read_root():
-    index_path = os.path.join(static_dir, "index.html")
+    index_path = os.path.join(os.path.dirname(__file__), "index.html")
 
     if os.path.exists(index_path):
         with open(index_path, "r", encoding="utf-8") as f:
@@ -73,10 +73,6 @@ async def upload_evidence(
     file: UploadFile = File(...),
     investigator: str = Form("Officer Admin")
 ):
-    """
-    Step 1: Cryptographic Ingestion & Evidence Lock
-    Computes SHA-256, SHA-3, logs Chain of Custody entry.
-    """
     try:
         content = await file.read()
 
@@ -107,7 +103,6 @@ async def upload_evidence(
 
 @app.get("/api/evidence/chain-of-custody")
 async def get_chain_of_custody():
-    """Returns the immutable Chain of Custody audit ledger."""
     return {
         "chain_of_custody": ingester.get_ledger(),
         "total_records": len(ingester.get_ledger())
@@ -116,7 +111,6 @@ async def get_chain_of_custody():
 
 @app.get("/api/evidence/list")
 async def get_evidence_list():
-    """Returns list of all cryptographically locked evidence files."""
     return {
         "files": ingester.get_evidence_files(),
         "total_files": len(ingester.get_evidence_files())
@@ -125,16 +119,15 @@ async def get_evidence_list():
 
 @app.get("/api/forensics/demo-scenario")
 async def load_demo_scenario():
-    """
-    Loads the SUTRAM 2026 Master Attack Demo Scenario:
-    1. USB Device Attached (Kingston 32GB)
-    2. File Exfiltration (confidential_q3.xlsx to E:)
-    3. Obfuscated PowerShell Execution (Base64 flag)
-    4. DNS C2 Beaconing to malicious domain
-    """
     demo_data = correlation_engine.load_demo_scenario()
-    graph_data = graph_engine.build_graph(demo_data["events"])
-    mitre_data = correlation_engine.get_mitre_matrix(demo_data["events"])
+
+    graph_data = graph_engine.build_graph(
+        demo_data["events"]
+    )
+
+    mitre_data = correlation_engine.get_mitre_matrix(
+        demo_data["events"]
+    )
 
     return {
         "status": "SUCCESS",
@@ -147,7 +140,6 @@ async def load_demo_scenario():
 
 @app.get("/api/forensics/timeline")
 async def get_timeline():
-    """Returns microsecond-synchronized timeline swimlanes."""
     timeline = correlation_engine.get_unified_timeline()
 
     return {
@@ -158,8 +150,8 @@ async def get_timeline():
 
 @app.get("/api/forensics/graph")
 async def get_causal_graph():
-    """Returns the visual node-link causal event graph."""
     events = correlation_engine.get_unified_timeline()
+
     graph_data = graph_engine.build_graph(events)
 
     return graph_data
@@ -167,7 +159,6 @@ async def get_causal_graph():
 
 @app.get("/api/forensics/mitre-matrix")
 async def get_mitre_mapping():
-    """Returns mapping of evidence to MITRE ATT&CK tactics & techniques."""
     events = correlation_engine.get_unified_timeline()
 
     return correlation_engine.get_mitre_matrix(events)
@@ -180,12 +171,12 @@ class CopilotQuery(BaseModel):
 
 @app.post("/api/copilot/query")
 async def query_copilot(request: CopilotQuery):
-    """
-    Step 3: Zero-Hallucination Grounded AI Copilot Query
-    Answers investigator questions strictly using verified event logs and timestamps.
-    """
     events = correlation_engine.get_unified_timeline()
-    response = copilot.analyze(request.query, events)
+
+    response = copilot.analyze(
+        request.query,
+        events
+    )
 
     return response
 
@@ -195,12 +186,10 @@ async def generate_sec65b_certificate(
     investigator_name: str = Form("Inspector V. Sharma"),
     agency: str = Form("Cyber Crime Cell, Delhi Police"),
     case_reference: str = Form("FIR-2026/0492-SUTRAM"),
-    device_details: str = Form("Forensic Workstation RIG-01 (Ubuntu 24.04 LTS)")
+    device_details: str = Form(
+        "Forensic Workstation RIG-01 (Ubuntu 24.04 LTS)"
+    )
 ):
-    """
-    Step 4: Bharatiya Sakshya Adhiniyam (BSA 2023) / Sec 65B Certificate Generation
-    Outputs legally certified electronic evidence document with SHA-256 hashes & tamper-evident signature.
-    """
     events = correlation_engine.get_unified_timeline()
     ledger = ingester.get_ledger()
 
